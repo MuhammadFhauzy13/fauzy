@@ -1,8 +1,27 @@
+import { useEffect, useRef } from 'react';
 import { ArrowRight, Download } from 'lucide-react';
 import { Github, Linkedin, Twitter } from './Icons';
-import { motion } from 'framer-motion';
+import { motion, useAnimation } from 'framer-motion';
 
 const Hero = () => {
+  const controls = useAnimation();
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          controls.start({ opacity: 1, y: 0 });
+        } else {
+          controls.start({ opacity: 0, y: 30 });
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [controls]);
+
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
       {/* Background blobs for visual flair */}
@@ -12,8 +31,9 @@ const Hero = () => {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10 w-full">
         <motion.div
+          ref={ref}
           initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={controls}
           transition={{ duration: 0.8 }}
           className="space-y-8"
         >

@@ -15,6 +15,32 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const scrollToSection = (href) => {
+    const target = document.querySelector(href);
+    if (!target) return;
+    const top = target.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top, behavior: 'smooth' });
+  };
+
+  const handleDesktopClick = (e, href) => {
+    e.preventDefault();
+    scrollToSection(href);
+  };
+
+  const handleMobileClick = (e, href) => {
+    e.preventDefault();
+    // Pre-calculate the position BEFORE closing the menu
+    // (closing changes the DOM layout, making measurement unreliable)
+    const target = document.querySelector(href);
+    if (!target) return;
+    const top = target.getBoundingClientRect().top + window.scrollY;
+    setIsOpen(false);
+    // Wait for menu close animation (300ms) then scroll to pre-calculated position
+    setTimeout(() => {
+      window.scrollTo({ top, behavior: 'smooth' });
+    }, 350);
+  };
+
   const navLinks = [
     { name: 'Home', href: '#home' },
     { name: 'About', href: '#about' },
@@ -44,12 +70,13 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
           </div>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden lg:flex items-center space-x-8">
             <div className="flex space-x-6">
               {navLinks.map((link) => (
                 <a
                   key={link.name}
                   href={link.href}
+                  onClick={(e) => handleDesktopClick(e, link.href)}
                   className="text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-sm font-medium"
                 >
                   {link.name}
@@ -68,13 +95,17 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                 <Moon className="h-5 w-5 text-slate-600" />
               )}
             </button>
-            <a href="#contact" className="px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors shadow-lg shadow-blue-500/30">
+            <a
+              href="#contact"
+              onClick={(e) => handleDesktopClick(e, '#contact')}
+              className="px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors shadow-lg shadow-blue-500/30"
+            >
               Let's Talk
             </a>
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center gap-4">
+          <div className="lg:hidden flex items-center gap-4">
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
@@ -99,7 +130,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="md:hidden absolute top-full left-0 w-full bg-white dark:bg-slate-900 shadow-xl border-t border-slate-100 dark:border-slate-800 overflow-hidden"
+            className="lg:hidden absolute top-full left-0 w-full bg-white dark:bg-slate-900 shadow-xl border-t border-slate-100 dark:border-slate-800 overflow-hidden"
           >
           <div className="px-4 pt-2 pb-6 space-y-1">
             {navLinks.map((link) => (
@@ -107,7 +138,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
                 key={link.name}
                 href={link.href}
                 className="block px-3 py-4 text-base font-medium text-slate-700 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 border-b border-slate-100 dark:border-slate-800"
-                onClick={() => setIsOpen(false)}
+                onClick={(e) => handleMobileClick(e, link.href)}
               >
                 {link.name}
               </a>
@@ -115,7 +146,7 @@ const Navbar = ({ darkMode, toggleDarkMode }) => {
             <a
               href="#contact"
               className="mt-4 block w-full text-center px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors shadow-lg shadow-blue-500/30"
-              onClick={() => setIsOpen(false)}
+              onClick={(e) => handleMobileClick(e, '#contact')}
             >
               Let's Talk
             </a>

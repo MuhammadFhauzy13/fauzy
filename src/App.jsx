@@ -10,9 +10,8 @@ function App() {
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
-    // Check local storage or system preference on load
-    const isDark = localStorage.getItem('theme') === 'dark' || 
-      (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    // Check local storage preference on load, default to light mode
+    const isDark = localStorage.getItem('theme') === 'dark';
     
     if (isDark) {
       document.documentElement.classList.add('dark');
